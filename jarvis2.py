@@ -7,16 +7,20 @@ import os
 import webbrowser
 import smtplib
 import timeit
+import datetime
 
                           # vorbeste
-def talkToMe(text):       # trebuie instalat sudo apt-install espeak-ng....
+def talkToMe(text, engine):       # trebuie instalat sudo apt-install espeak-ng....
+    engine.say(text)
+    engine.runAndWait()
+
+
+def setVoice():                                           # set some voice parameters
     engine = pyttsx3.init(driverName='espeak')
     engine.setProperty('rate',137)  #120 words per minute
     engine.setProperty('volume',0.9) 
     engine.setProperty('voice', 'english')  # also 'romanian'
-    engine.say(text)
-    engine.runAndWait()
-
+    return engine
 
 
 def setMic():
@@ -46,7 +50,8 @@ def myCommand(r):
     try:
         command = r.recognize_google(audio).lower()
         print('You said: ' + command + '\n')
-        talkToMe(command)
+        #talkToMe(command, engine)
+        assistant(command)
 
     #loop back to continue to listen for commands if unrecognizable speech is received
     except sr.UnknownValueError:
@@ -61,19 +66,44 @@ def myCommand(r):
 
 
 
-def assistant(command):                                  #executa
-    if 'reddit' in command:
-        '''
+def assistant(command):                                  #exec
+    if 'open google' in command:                                                      # open Google
+        talkToMe(command, engine)
         chrome_path = '/usr/bin/google-chrome'
-        url = "https://www.reddit.com/r/python"
-        webbrowser.get(chrome_path).open(url)'''
+        url = "https://www.google.com/"
+        webbrowser.get(chrome_path).open(url)
         #talkToMe("Reddit")
+    if 'exit' in command:                                                             # shut down itself 
+        talkToMe("Goodbye creator", engine)
+        quit()
+    if 'who is the out boss' in command:                                              # know reality
+        talkToMe("God is", engine)
+    if 'search for' in command:                                                       # know how to browse on google  
+        talkToMe(command, engine)
+        no_wites = command.split(" ")
+        parsed = no_wites[2]
+        for x in range(3, len(no_wites)):
+            parsed = parsed + "+" + no_wites[x]
+        link = "https://www.google.ro/search?q=" + parsed
+        chrome_path = '/usr/bin/google-chrome'
+        webbrowser.get(chrome_path).open(link)
+
+    if 'shutdown my pc' in command:                                                   # shutdown my pc 
+        talkToMe("shutting down", engine)
+        os.system('systemctl poweroff')
+    if 'what time' in command:
+        talkToMe("Time is", engine)
+        now = datetime.datetime.now()
+        engine.setProperty('rate',110)
+        talkToMe("Hour . " + str(now.hour) + " .  Minutes  .  " + str(now.minute) ,engine)
+        engine.setProperty('rate',137)
+    if '' in command:
+        pass
 
 
 
-
-
+engine = setVoice()
 r = setMic()                  # set the mic parameters
-talkToMe("Hello Patrick !")
+talkToMe("Hello Patrick !", engine)
 while True:
     myCommand(r)
