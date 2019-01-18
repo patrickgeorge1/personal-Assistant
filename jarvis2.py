@@ -1,23 +1,25 @@
 from gtts import gTTS
+from io import BytesIO
+import subprocess
+import pyttsx3
 import speech_recognition as sr
 import os
 import webbrowser
 import smtplib
 import timeit
 
-def talkToMe(audio):                          # vorbeste
-    #start = timeit.timeit()
-    print(audio)
-    tts = gTTS(text=audio, lang="en")
-    tts.save("audio.mp3")
-    os.system('mpg123 audio.mp3')
-    #end = timeit.timeit()
-    #print("Time = " + str(end - start))
+                          # vorbeste
+def talkToMe(text):       # trebuie instalat sudo apt-install espeak-ng....
+    engine = pyttsx3.init(driverName='espeak')
+    engine.setProperty('rate',137)  #120 words per minute
+    engine.setProperty('volume',0.9) 
+    engine.setProperty('voice', 'english')  # also 'romanian'
+    engine.say(text)
+    engine.runAndWait()
 
 
 
-
-def set():
+def setMic():
     "Configure the mic https://github.com/Uberi/speech_recognition/blob/master/reference/library-reference.rst"
     r = sr.Recognizer()
     r.dynamic_energy_threshold = True          # when it s active you can configure manually
@@ -71,7 +73,7 @@ def assistant(command):                                  #executa
 
 
 
-r = set()                  # set the mic parameters
+r = setMic()                  # set the mic parameters
 talkToMe("Hello Patrick !")
 while True:
     myCommand(r)
